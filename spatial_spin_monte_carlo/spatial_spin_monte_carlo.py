@@ -8,11 +8,10 @@ initial conditions and background fields.
 
 #Python functions:
 import numpy as np
-import pdb
 import networkx as nx
 import math
 from scipy import stats
-from scipy.sparse.linalg import eigs, eigsh
+from scipy.sparse.linalg import eigsh
 from tqdm import tqdm as tqdm
 
 def crit_beta(graph):
