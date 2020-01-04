@@ -19,10 +19,7 @@ def crit_beta(graph):
 	"""
 
 	Estimates the critical value of the inverse
-	temperature for a finit sized graph.
-
-	Note: for larger graphs we will instead need to use functions
-	from ARPACK to estimate the largest eigenvalue.
+	temperature for a finite sized graph.
 
 	Parameters
 	-------------
@@ -34,7 +31,7 @@ def crit_beta(graph):
 
 	crit_beta : float
 
-	inverse of the largest eigenvalue of the
+	Inverse of the largest eigenvalue of the
 	adjacency matrix associated with A.
 
 	"""
@@ -64,7 +61,6 @@ def crit_beta_sparse(graph) :
 	crit_beta : float
 
 	Inverse spectral radius of the graph
-
 
 	"""
 
@@ -134,7 +130,11 @@ class spins :
 		"""
 
 		Return the external field at a certain point in the embedding
-		space. 
+		space.
+
+		If the scalar_field variable is not a numpy array
+		then we will assume that it is a function which
+		takes node labels (or positions) as an inpute.
 		
 		Parameters
 		------------
@@ -150,12 +150,6 @@ class spins :
 
 		"""
 
-		"""
-		If the scalr field is not a numpy
-		array we assume that it is a function
-		which takes node labels/positions as
-		an input.
-		"""
 		if isinstance(self.scalar_field,np.ndarray)  :
 			h = self.scalar_field[target_node]
 		else :
@@ -174,7 +168,11 @@ class spins :
 		Returns the probability to perform a single spin flip
 		for Glauber dynamics.
 
-		See Lynn and Lee 2016 equation (1)
+		For details see:
+
+		Levine, D. "Glauber dynamics for ising model." AMS Short Course (2010).
+
+		at: https://darkwing.uoregon.edu/~dlevin/AMS_shortcourse/ams_ising.pdf
 
 		Parameters
 		-------------
@@ -202,6 +200,19 @@ class spins :
 	
 
 	def spin_flip_probability_metropolis(self,target_node,neighbour_state_sum,h=0) :
+
+		"""
+
+		Returns the probaility to perform a spin flip under
+		Metropolis Hastings proposal.
+
+		See chapter 3 of:
+
+		Newman, M., and G. Barkema. Monte carlo methods in statistical physics chapter 1-4. Oxford University Press: New York, USA, 1999.
+
+		In particular equation (3.6).
+
+		"""
 
 		target_node_spin = self.node_states[target_node]
 		Energy_Difference = 2.0*target_node_spin*(neighbour_state_sum + h)
@@ -231,17 +242,14 @@ class spins :
 
 		if self.sampling_method == "Metropolis" :
 			prob = self.spin_flip_probability_metropolis(target_node,neighbour_state_sum,h=h_target)
+			u = np.random.uniform(0, 1)
+			if prob > u:
+				self.update_spin(target_node, -1.0 * self.node_states[target_node])
+
 		elif self.sampling_method == "Glauber" :
 			prob = self.spin_flip_probability_glauber(neighbour_state_sum, h=h_target)
+			self.update_spin(target_node, self.pick_random_up_or_down(prob))
 
-		#Update stats:
-		if self.sampling_method == "Glauber" :
-			self.update_spin(target_node,self.pick_random_up_or_down(prob))
-
-		elif self.sampling_method == "Metropolis" :
-			u = np.random.uniform(0, 1)
-			if prob > u :
-				self.update_spin(target_node, -1.0*self.node_states[target_node])
 
 	def neighbour_state_sum(self,target_node) :
 		neighbour_nodes = self.graph.neighbors(target_node)
@@ -253,8 +261,9 @@ class spatial_spins(spins) :
 
 	"""
 	Child of the spin class in which we
-	associate node labels with positions
-	(or in general any array label).
+	associate node labels with positions.
+	Will also support more general labels
+	for nodes (e.g str's / text attributes)
 	"""
 
 	def __init__(self,positions,graph) :
