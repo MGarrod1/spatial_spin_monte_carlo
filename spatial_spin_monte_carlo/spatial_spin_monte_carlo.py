@@ -21,6 +21,15 @@ def crit_beta(graph):
 	Estimates the critical value of the inverse
 	temperature for a finite sized graph.
 
+	The critical temperature is estimated using the
+	inverse of the spectral radius of the adjacency
+	matrix. This assume a mean-field approximation.
+	See section 3 in:
+
+	Lynn, Christopher, and Daniel D. Lee. "Maximizing influence in an ising network: A mean-field optimal solution." Advances in Neural Information Processing Systems. 2016.
+
+	for details.
+
 	Parameters
 	-------------
 
@@ -49,6 +58,15 @@ def crit_beta_sparse(graph) :
 
 	Estimate the critical temperature of
 	a large graph using sparse matrices.
+
+	The critical temperature is estimated using the
+	inverse of the spectral radius of the adjacency
+	matrix. This assume a mean-field approximation.
+	See section 3 in:
+
+	Lynn, Christopher, and Daniel D. Lee. "Maximizing influence in an ising network: A mean-field optimal solution." Advances in Neural Information Processing Systems. 2016.
+
+	for details.
 
 	Parameters
 	--------------
