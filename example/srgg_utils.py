@@ -3,17 +3,14 @@
 Functions used to generate and
 plot Soft RGGs.
 
-Created on: 17/12/19
-
 """
 
 import numpy as np
 import networkx as nx
-import math
 import matplotlib.pyplot as plt
 
 
-def Euclidean_Distance(x,y,Boundaries = 'S'):
+def Euclidean_Distance(x,y,Boundaries = 'S',Dom_Size=1.0):
 	"""
 	Euclidean distance between positions x and y. 
 	"""
@@ -59,7 +56,6 @@ def Make_Soft_RGG_Given_Positions(positions,Kernel,metric="Euclidean",return_con
 	Returns
 	---------------
 
-
 	G : networkx graph. 
 
 
@@ -67,13 +63,7 @@ def Make_Soft_RGG_Given_Positions(positions,Kernel,metric="Euclidean",return_con
 
 	"""
 
-	
-
 	N = len(positions)
-	
-	
-	#Define empty connection probability matrix:
-	#Should not allow this for large N?
 	Connection_Probabilities = np.zeros( (N,N) ) 
 	
 
@@ -113,13 +103,7 @@ def Make_Soft_RGG_Given_Positions(positions,Kernel,metric="Euclidean",return_con
 class graph_plot :
 
 	"""
-	Class for plotting graphs. Allows the attrbiutes to be
-	edited if required. 
-	
-	Focus on spatial graphs. 
-	
-	Makes use of networkx's plotting function.
-	
+	Class for plotting spatial graphs.
 	"""
 	
 	def __init__( self , graph , positions = None ) :
