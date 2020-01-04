@@ -288,11 +288,11 @@ def Run_MonteCarlo(graph,T,beta,T_Burn=0,positions=None,Initial_State=None,contr
 	
 	graph : networkx graph
 	
-	network structure
+	Connectivity structure of the spin system to be simulated.
 	
 	T : int
 	
-	number of time steps to run the simulation for
+	Number of time steps to run the simulation for
 	
 	beta : float
 	
@@ -308,13 +308,27 @@ def Run_MonteCarlo(graph,T,beta,T_Burn=0,positions=None,Initial_State=None,contr
 	Positions of nodes. Needs to be in the same order as the
 	node list. If this is specified we use the spatial spins
 	class.
+
+	Initial_State : numpy array
+
+	Initial condition for the dynamics.
+
+	control_field : numpy array OR function
+
+	Array specifying the external field experienced
+	by each node in the graph.
+
+	sampling_method : str (opt)
+
+	Choice of acceptance probability for the Markov
+	Chain. Valid options are: "Metropolis" or "Glauber"
 	
 	Returns
 	------------
 	
 	Spin_Series : ndarray (N x T) 
 	
-	Array continaing time series of spin values for each
+	Array containing time series of spin values for each
 	of the nodes. 
 	
 	"""
@@ -366,36 +380,40 @@ def sample_magnetization_series(graph, T, beta, positions = None, T_Burn=0, Init
 	
 	graph : networkx graph
 	
-	The connectivity graph for the Ising system.
+	Connectivity structure of the spin system to be simulated.
 
 	T : int
 
-	Number of timesteps to run simulations for.
+	Number of time steps to run the simulation for
 
 	beta : float
 
-	Inverse temperature of the Ising system.
-	
-	positions : numpy array (opt)
-	
-	positions associated with the nodes .
+	Inverse temperature
 
-	T_Burn : int (optional)
-	
-	Select a burn in time for the Ising simulations.
-	
-	Initial_State : int (optional)
-	
-	Set the initial state for the Ising system.
-	
-	control_field : function or array
-	
-	control field acting on the spin system.
+	T_Burn : int (opt)
+
+	Burn in time. We run the dynamics for T+T_Burn timesteps
+	and only record samples after T_Burn.
+
+	positions : numpy ndarray (optional)
+
+	Positions of nodes. Needs to be in the same order as the
+	node list. If this is specified we use the spatial spins
+	class.
+
+	Initial_State : numpy array
+
+	Initial condition for the dynamics.
+
+	control_field : numpy array OR function
+
+	Array specifying the external field experienced
+	by each node in the graph.
 
 	sampling_method : str (opt)
 
-	Choose between sampling using Metropolis or Glauber
-	dynamics. Valid choices are: "Glauber" or "Metropolis".
+	Choice of acceptance probability for the Markov
+	Chain. Valid options are: "Metropolis" or "Glauber"
 
 	take_positive : bool (opt)
 
@@ -422,15 +440,59 @@ def sample_magnetization_series(graph, T, beta, positions = None, T_Burn=0, Init
 	
 	return magnetization_series
 
-def sample_magnetization_average(graph, T, Glauber_Runs , beta,positions=None , T_Burn=0, Initial_State=None,control_field=None) :
+def sample_magnetization_average(graph, T, MC_Runs , beta,positions=None , T_Burn=0, Initial_State=None,control_field=None,sampling_method="Metropolis") :
 
 	"""
-	
-	Average magnetization at the end of the chain
-	for a specified number of Glauber runs.
 
-	For each glauber run we take the average magnetization
+	Sample the average magnetization by taking the
+	average over multiple Markov Chains.
+
+	For each chain we take the average magnetization
 	for the period after the burn in time.
+
+	Parameters
+	---------------
+
+	graph : networkx graph
+
+	Connectivity structure of the spin system to be simulated.
+
+	T : int
+
+	Number of time steps to run the simulation for.
+
+	MC_Runs : int
+
+	Number of markov chains to average over.
+
+	beta : float
+
+	Inverse temperature
+
+	T_Burn : int (opt)
+
+	Burn in time. We run the dynamics for T+T_Burn timesteps
+	and only record samples after T_Burn.
+
+	positions : numpy ndarray (optional)
+
+	Positions of nodes. Needs to be in the same order as the
+	node list. If this is specified we use the spatial spins
+	class.
+
+	Initial_State : numpy array
+
+	Initial condition for the dynamics.
+
+	control_field : numpy array OR function
+
+	Array specifying the external field experienced
+	by each node in the graph.
+
+	sampling_method : str (opt)
+
+	Choice of acceptance probability for the Markov
+	Chain. Valid options are: "Metropolis" or "Glauber"
 
 	Returns
 	------------
@@ -449,9 +511,8 @@ def sample_magnetization_average(graph, T, Glauber_Runs , beta,positions=None , 
 
 	time_averaged_magnetizations = [ ]
 
-
-	for q in tqdm( range(Glauber_Runs) ) :
-		mean_mag = sample_magnetization_series(graph, T, beta, positions= positions , T_Burn=T_Burn, Initial_State=Initial_State,control_field=control_field)
+	for q in tqdm( range(MC_Runs) ) :
+		mean_mag = sample_magnetization_series(graph, T, beta, positions= positions , T_Burn=T_Burn, Initial_State=Initial_State,control_field=control_field,sampling_method=sampling_method)
 		time_averaged_magnetizations.append(  np.mean( mean_mag   ) )
 
 
