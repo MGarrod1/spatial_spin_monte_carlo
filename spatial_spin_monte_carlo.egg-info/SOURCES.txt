@@ -1,7 +1,0 @@
-README.md
-setup.py
-spatial_spin_monte_carlo/spatial_spin_monte_carlo.py
-spatial_spin_monte_carlo.egg-info/PKG-INFO
-spatial_spin_monte_carlo.egg-info/SOURCES.txt
-spatial_spin_monte_carlo.egg-info/dependency_links.txt
-spatial_spin_monte_carlo.egg-info/top_level.txt
